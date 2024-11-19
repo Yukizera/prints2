@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel de Ouro com Efeito Pisca-Pisca</title>
+    <style>
+        /* Estilo Geral (reutilizado e atualizado) */
+        body {
+            background-image: url('https://lh3.googleusercontent.com/d/1aZkNtHRKeVqDytyKIFauJ9TqPyFSAsv3');
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            font-family: 'Comic Sans MS', 'Comic Sans', cursive;
+            color: #ddd;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            overflow: hidden;
+        }
+        .panel {
+            width: 80%;
+            padding: 20px;
+            border: 2px solid #00ff0c;
+            border-radius: 15px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.5);
+            margin: 20px;
+            background-color: rgba(33, 33, 33, 0.9);
+            color: #ddd;
+        }
+        h2 {
+            font-size: 1.5em;
+            margin-bottom: 10px;
+            text-align: center;
+            color: #ecff00;
+        }
+        input[type="file"], input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            margin: 5px 0;
+            border: 2px dashed #00ff0c;
+            border-radius: 5px;
+            background-color: #444;
+            color: #ddd;
+            cursor: pointer;
+        }
+        button {
+            margin-top: 10px;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            background-color: #ff0000;
+            color: white;
+            cursor: pointer;
+            font-size: 1em;
+        }
+    </style>
+</head>
+<body>
+    <!-- Seção de Envio de Prints -->
+    <div class="panel">
+        <h2>Envio de Prints</h2>
+        <!-- Formulário de Upload utilizando Filestack -->
+        <form id="uploadForm">
+            <label for="nick">Nick:</label>
+            <input type="text" id="nick" name="nick" placeholder="Digite seu Nick" required>
+            <br><br>
+            <label for="server">Server:</label>
+            <input type="text" id="server" name="server" placeholder="Digite o nome do Servidor" required>
+            <br><br>
+            <label for="itemScreenshot">Print do Item:</label>
+            <input type="file" id="itemScreenshot" name="itemScreenshot" accept="image/*" required>
+            <br><br>
+            <label for="paymentProof">Comprovante de Pagamento:</label>
+            <input type="file" id="paymentProof" name="paymentProof" accept="image/*" required>
+            <br><br>
+            <button type="button" id="uploadButton">Enviar Prints</button>
+        </form>
+        <div id="uploadStatus"></div> <!-- Área para exibir o status do upload -->
+    </div>
+
+    <!-- Scripts -->
+    <script type="text/javascript" src="https://static.filestackapi.com/v3/filestack.js"></script>
+    <script>
+        // Inicializar o Filestack com a sua chave de API
+        const client = filestack.init('AUeTXtVdFTRu29MRYZOMWz');  // Substitua 'SUA_API_KEY' pela sua chave do Filestack
+
+        // Função de Upload de Arquivo
+        document.getElementById('uploadButton').addEventListener('click', function() {
+            // Obter os valores dos campos adicionais
+            const nick = document.getElementById('nick').value;
+            const server = document.getElementById('server').value;
+
+            // Validar os campos
+            if (!nick || !server) {
+                alert('Por favor, preencha todos os campos antes de enviar.');
+                return;
+            }
+
+            // Obter os arquivos do formulário
+            const fileInputItem = document.getElementById('itemScreenshot');
+            const fileInputPayment = document.getElementById('paymentProof');
+
+            if (fileInputItem.files.length === 0 || fileInputPayment.files.length === 0) {
+                alert('Por favor, selecione ambos os arquivos antes de enviar.');
+                return;
+            }
+
+            // Iniciar o upload utilizando Filestack para os dois arquivos
+            const fileItem = fileInputItem.files[0];
+            const filePayment = fileInputPayment.files[0];
+
+            client.upload(fileItem).then(result => {
+                console.log('Item screenshot enviado com sucesso:', result);
+                document.getElementById('uploadStatus').innerHTML = 'Print do Item enviado com sucesso!';
+
+                console.log('URL do item screenshot:', result.url);
+            }).catch(error => {
+                console.error('Erro no envio do Print do Item:', error);
+                document.getElementById('uploadStatus').innerHTML = 'Erro ao enviar o Print do Item.';
+            });
+
+            client.upload(filePayment).then(result => {
+                console.log('Comprovante de pagamento enviado com sucesso:', result);
+                document.getElementById('uploadStatus').innerHTML += '<br>Comprovante de pagamento enviado com sucesso!';
+
+                console.log('URL do comprovante de pagamento:', result.url);
+            }).catch(error => {
+                console.error('Erro no envio do comprovante de pagamento:', error);
+                document.getElementById('uploadStatus').innerHTML += '<br>Erro ao enviar o Comprovante de Pagamento.';
+            });
+        });
+    </script>
+</body>
+</html>
